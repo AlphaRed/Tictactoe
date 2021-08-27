@@ -40,9 +40,9 @@ LCD_off:
 ld hl, $FF40
 res 7, [hl] ; reset the bit to turn off LCD
 	
-ld hl, $9000 + 16 ; load the tile into VRAM
-ld de, smiley_sprite
-ld b, 32 ; two sprites (16 x 2)
+ld hl, $9000 ; load the tiles into VRAM
+ld de, tictactoe
+ld b, 64 ; four sprites (16 x 4)
 copy_loop:
 	ld a, [de]
 	inc de
@@ -50,19 +50,88 @@ copy_loop:
 	dec b
 	jr nz, copy_loop
 	
-ld hl, $9800 ; set the tilemap
-ld [hl], 1
-
-ld hl, $9802
-ld [hl], 2
-
 ld hl, $FF47 ; set the palette, super basic one for now
 ld [hl], $E4
  
 ld hl, $FF40 ; set where it looks for BG tilemap
 ld [hl], $81
 
+; clear the tilemap to zeros
+ld hl, $9800
+ld bc, 1024 ; 32 x 32 tilemap
+clear_loop:
+	ld [hl], 0
+	inc hl
+	dec bc
+	ld a, b
+	OR c
+	jp nz, clear_loop
+
+; Wait for vblank
+LCD_off1:
+	ld a, ($FF44) ; grab horizontal line draw and compare with 145
+	cp 145
+	jr nz, LCD_off1
+
+; draw the board
+ld hl, $9800 + 2
+ld [hl], 1
+ld hl, $9800 + 5
+ld [hl], 1
+ld hl, $9800 + 32 + 2
+ld [hl], 1
+ld hl, $9800 + 32 + 5
+ld [hl], 1
+ld hl, $9800 + 64
+ld [hl], 2
+ld hl, $9800 + 64 + 1
+ld [hl], 2
+ld hl, $9800 + 64 + 2
+ld [hl], 3
+ld hl, $9800 + 64 + 3
+ld [hl], 2
+ld hl, $9800 + 64 + 4
+ld [hl], 2
+ld hl, $9800 + 64 + 5
+ld [hl], 3
+ld hl, $9800 + 64 + 6
+ld [hl], 2
+ld hl, $9800 + 64 + 7
+ld [hl], 2
+ld hl, $9800 + 96 + 2
+ld [hl], 1
+ld hl, $9800 + 96 + 5
+ld [hl], 1
+ld hl, $9800 + 128 + 2
+ld [hl], 1
+ld hl, $9800 + 128 + 5
+ld [hl], 1
+ld hl, $9800 + 160
+ld [hl], 2
+ld hl, $9800 + 160 + 1
+ld [hl], 2
+ld hl, $9800 + 160 + 2
+ld [hl], 3
+ld hl, $9800 + 160 + 3
+ld [hl], 2
+ld hl, $9800 + 160 + 4
+ld [hl], 2
+ld hl, $9800 + 160 + 5
+ld [hl], 3
+ld hl, $9800 + 160 + 6
+ld [hl], 2
+ld hl, $9800 + 160 + 7
+ld [hl], 2
+ld hl, $9800 + 192 + 2
+ld [hl], 1
+ld hl, $9800 + 192 + 5
+ld [hl], 1
+ld hl, $9800 + 224 + 2
+ld [hl], 1
+ld hl, $9800 + 224 + 5
+ld [hl], 1
+
 end:
 jp end
 
-smiley_sprite: .DB $00, $00, $00, $00, $24, $24, $00, $00, $81, $81, $7E, $7E, $00, $00, $00, $00, $FF, $BE, $FF, $8C, $FF, $E5, $FF, $F5, $FF, $E0, $FF, $F0, $FF, $03, $FF, $60
+tictactoe: .DB $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$00,$00,$00,$00,$00,$00,$FF,$FF,$FF,$FF,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$FF,$FF,$FF,$FF,$18,$18,$18,$18,$18,$18
