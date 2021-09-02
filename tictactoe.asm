@@ -53,8 +53,8 @@ copy_loop:
 ld hl, $FF47 ; set the palette, super basic one for now
 ld [hl], $E4
  
-ld hl, $FF40 ; set where it looks for BG tilemap
-ld [hl], $81
+ld hl, $FF40 ; set where it looks for BG tilemap (also turn on sprites)
+ld [hl], $83
 
 ; clear the tilemap to zeros
 ld hl, $9800
@@ -131,7 +131,39 @@ ld [hl], 1
 ld hl, $9800 + 224 + 5
 ld [hl], 1
 
+; Wait for vblank... should redo these one day
+LCD_off2:
+	ld a, ($FF44) ; grab horizontal line draw and compare with 145
+	cp 145
+	jr nz, LCD_off2
+	
+ld hl, $8000 ; load the sprites into VRAM
+ld de, sprites
+ld b, 48 ; three sprites (16 x 3)
+sprite_loop:
+	ld a, [de]
+	inc de
+	ld [hl+], a
+	dec b
+	jr nz, sprite_loop
+
+; Load into sprite attributes into OAM, do it the janky way for now then change to DMA another day
+ld hl, $FE00
+ld [hl], $10 ; Y coord
+ld hl, $FE00 + 1
+ld [hl], $08 ; X coord
+ld hl, $FE00 + 2
+ld [hl], $00 ; tile num
+ld hl, $FE00 + 3
+ld [hl], $00 ; attributes, keep zero for now
+
+; set the sprite palette
+ld hl, $FF48
+ld [hl], $E4
+
 end:
 jp end
 
 tictactoe: .DB $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$00,$00,$00,$00,$00,$00,$FF,$FF,$FF,$FF,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$FF,$FF,$FF,$FF,$18,$18,$18,$18,$18,$18
+
+sprites: .DB $18,$18,$3C,$3C,$7E,$7E,$FF,$FF,$00,$00,$00,$00,$00,$00,$00,$00,$82,$82,$44,$44,$28,$28,$10,$10,$28,$28,$44,$44,$82,$82,$00,$00,$38,$38,$44,$44,$82,$82,$82,$82,$82,$82,$44,$44,$38,$38,$00,$00
