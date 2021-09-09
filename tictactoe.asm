@@ -32,6 +32,17 @@ jp start
 .ORG $0150
 start:
 
+; DMA copy routine!
+ld hl, $FF80 ; to HRAM
+ld de, DMA_transfer
+ld b, DMA_end - DMA_transfer ; how big is it?
+DMA_copy_loop:
+	ld a, [de]
+	inc de
+	ld [hl+], a
+	dec b
+	jr nz, DMA_copy_loop
+
 LCD_off:
 	ld a, ($FF44) ; grab horizontal line draw and compare with 145
 	cp 145
@@ -161,8 +172,40 @@ ld [hl], $00 ; attributes, keep zero for now
 ld hl, $FF48
 ld [hl], $E4
 
+; clear RAM area for OAM for DMA transfer!
+ld hl, $C000
+ld b, 160 ; 40 sprites x 4 bytes
+OAM_clear_loop:
+	ld [hl], 0
+	inc hl
+	dec b
+	jr nz, OAM_clear_loop
+
+; Setup RAM area for DMA transfer
+ld hl, $C000
+ld [hl], $20 ; Y coord
+ld hl, $C000 + 1
+ld [hl], $10 ; X coord
+ld hl, $C000 + 2
+ld [hl], $00 ; tile num
+ld hl, $C000 + 3
+ld [hl], $00 ; attributes, keep zero for now
+
+call $FF80
+	
 end:
 jp end
+
+; Start the DMA transfer, write the source in RAM!
+DMA_transfer:
+	ld a, $C0 ; to change! where is the stuff!
+	ld [$FF46], a ; $C000 divided by $100
+	ld b, 40
+@DMA_wait:
+	dec b
+	jr nz, @DMA_wait
+	ret
+DMA_end: ; just for calculating size!
 
 tictactoe: .DB $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$00,$00,$00,$00,$00,$00,$FF,$FF,$FF,$FF,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$FF,$FF,$FF,$FF,$18,$18,$18,$18,$18,$18
 
