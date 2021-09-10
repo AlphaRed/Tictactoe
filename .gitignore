@@ -1,0 +1,7 @@
+*.dll
+*.exe
+*.o
+*.gb
+*.bat
+/bin/*
+/.vscode/*
