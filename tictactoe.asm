@@ -19,6 +19,18 @@ SLOT 1 $4000
 
 .BANK 0 SLOT 0
 
+; Interrupts
+.ORG $0040 ; Vblank
+	reti
+.ORG $0048 ; LCD scanline
+	reti
+.ORG $0050 ; timer 
+	reti
+.ORG $0058 ; serial
+	reti
+.ORG $0060 ; joypad int
+	reti
+
 .ORG $0100
 nop
 jp start
@@ -36,17 +48,9 @@ start:
 ld hl, $FF80 ; to HRAM
 ld de, DMA_transfer
 ld b, DMA_end - DMA_transfer ; how big is it?
-DMA_copy_loop:
-	ld a, [de]
-	inc de
-	ld [hl+], a
-	dec b
-	jr nz, DMA_copy_loop
+call copy_loop
 
-LCD_off:
-	ld a, ($FF44) ; grab horizontal line draw and compare with 145
-	cp 145
-	jr nz, LCD_off
+call LCD_off
 
 ld hl, $FF40
 res 7, [hl] ; reset the bit to turn off LCD
@@ -54,12 +58,7 @@ res 7, [hl] ; reset the bit to turn off LCD
 ld hl, $9000 ; load the tiles into VRAM
 ld de, tictactoe
 ld b, 64 ; four sprites (16 x 4)
-copy_loop:
-	ld a, [de]
-	inc de
-	ld [hl+], a
-	dec b
-	jr nz, copy_loop
+call copy_loop
 	
 ld hl, $FF47 ; set the palette, super basic one for now
 ld [hl], $E4
@@ -78,85 +77,16 @@ clear_loop:
 	OR c
 	jp nz, clear_loop
 
-; Wait for vblank
-LCD_off1:
-	ld a, ($FF44) ; grab horizontal line draw and compare with 145
-	cp 145
-	jr nz, LCD_off1
+call LCD_off
 
-; draw the board
-ld hl, $9800 + 2
-ld [hl], 1
-ld hl, $9800 + 5
-ld [hl], 1
-ld hl, $9800 + 32 + 2
-ld [hl], 1
-ld hl, $9800 + 32 + 5
-ld [hl], 1
-ld hl, $9800 + 64
-ld [hl], 2
-ld hl, $9800 + 64 + 1
-ld [hl], 2
-ld hl, $9800 + 64 + 2
-ld [hl], 3
-ld hl, $9800 + 64 + 3
-ld [hl], 2
-ld hl, $9800 + 64 + 4
-ld [hl], 2
-ld hl, $9800 + 64 + 5
-ld [hl], 3
-ld hl, $9800 + 64 + 6
-ld [hl], 2
-ld hl, $9800 + 64 + 7
-ld [hl], 2
-ld hl, $9800 + 96 + 2
-ld [hl], 1
-ld hl, $9800 + 96 + 5
-ld [hl], 1
-ld hl, $9800 + 128 + 2
-ld [hl], 1
-ld hl, $9800 + 128 + 5
-ld [hl], 1
-ld hl, $9800 + 160
-ld [hl], 2
-ld hl, $9800 + 160 + 1
-ld [hl], 2
-ld hl, $9800 + 160 + 2
-ld [hl], 3
-ld hl, $9800 + 160 + 3
-ld [hl], 2
-ld hl, $9800 + 160 + 4
-ld [hl], 2
-ld hl, $9800 + 160 + 5
-ld [hl], 3
-ld hl, $9800 + 160 + 6
-ld [hl], 2
-ld hl, $9800 + 160 + 7
-ld [hl], 2
-ld hl, $9800 + 192 + 2
-ld [hl], 1
-ld hl, $9800 + 192 + 5
-ld [hl], 1
-ld hl, $9800 + 224 + 2
-ld [hl], 1
-ld hl, $9800 + 224 + 5
-ld [hl], 1
+call draw_board
 
-; Wait for vblank... should redo these one day
-LCD_off2:
-	ld a, ($FF44) ; grab horizontal line draw and compare with 145
-	cp 145
-	jr nz, LCD_off2
+call LCD_off
 	
 ld hl, $8000 ; load the sprites into VRAM
 ld de, sprites
 ld b, 48 ; three sprites (16 x 3)
-sprite_loop:
-	ld a, [de]
-	inc de
-	ld [hl+], a
-	dec b
-	jr nz, sprite_loop
+call copy_loop
 
 ; Load into sprite attributes into OAM, do it the janky way for now then change to DMA another day
 ld hl, $FE00
@@ -206,7 +136,3 @@ DMA_transfer:
 	jr nz, @DMA_wait
 	ret
 DMA_end: ; just for calculating size!
-
-tictactoe: .DB $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$00,$00,$00,$00,$00,$00,$FF,$FF,$FF,$FF,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$FF,$FF,$FF,$FF,$18,$18,$18,$18,$18,$18
-
-sprites: .DB $18,$18,$3C,$3C,$7E,$7E,$FF,$FF,$00,$00,$00,$00,$00,$00,$00,$00,$82,$82,$44,$44,$28,$28,$10,$10,$28,$28,$44,$44,$82,$82,$00,$00,$38,$38,$44,$44,$82,$82,$82,$82,$82,$82,$44,$44,$38,$38,$00,$00

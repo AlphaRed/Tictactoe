@@ -1,5 +1,6 @@
 [objects]
-tictactoe.o
+bin/tictactoe.o
+bin/gfx.o
 [libraries]
 [header]
 [footer]
