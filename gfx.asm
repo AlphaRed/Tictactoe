@@ -20,11 +20,12 @@ SLOT 1 $4000
 .BANK 0
 .SECTION "gfx" FREE
 
-; LCD_off function - For checking if in v-blank
-LCD_off:
+; Wait_vblank - for checking if in v-blank and waiting until it starts if not
+; No inputs
+Wait_vblank:
 	ld a, ($FF44) ; grab horizontal line draw and compare with 145
 	cp 145
-	jr nz, LCD_off
+	jr nz, Wait_vblank
     ret
 
 ; Draw the board function
@@ -87,21 +88,156 @@ draw_board:
     ld [hl], 1
     ret
 
+; Draw the menu function
+draw_menu:
+	ld hl, $9800 + (32 * 4) + 5 ; T
+    ld [hl], 23
+	ld hl, $9800 + (32 * 4) + 6 ; I
+    ld [hl], 12
+	ld hl, $9800 + (32 * 4) + 7 ; C
+    ld [hl], 6
+	ld hl, $9800 + (32 * 4) + 8 ; T
+    ld [hl], 23
+	ld hl, $9800 + (32 * 4) + 9 ; A
+    ld [hl], 4
+	ld hl, $9800 + (32 * 4) + 10 ; C
+    ld [hl], 6
+	ld hl, $9800 + (32 * 4) + 11 ; T
+    ld [hl], 23
+	ld hl, $9800 + (32 * 4) + 12 ; O
+    ld [hl], 18
+	ld hl, $9800 + (32 * 4) + 13 ; E
+    ld [hl], 8
+	ld hl, $9800 + (32 * 6) + 7 ; S
+    ld [hl], 22
+	ld hl, $9800 + (32 * 6) + 8 ; T
+    ld [hl], 23
+	ld hl, $9800 + (32 * 6) + 9 ; A
+    ld [hl], 4
+	ld hl, $9800 + (32 * 6) + 10 ; R
+    ld [hl], 21
+	ld hl, $9800 + (32 * 6) + 11 ; T
+    ld [hl], 23
+    ret
+
 ; Copy loop - for copying into a section of RAM (also good for DMA transfer)
 ; hl - output location
 ; de - input location
 ; b - counter
-copy_loop:
+Copy_loop:
 	ld a, [de]
 	inc de
 	ld [hl+], a
 	dec b
-	jr nz, copy_loop
+	jr nz, Copy_loop
     ret
 
-; Tictactoe board
-tictactoe: .DB $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$00,$00,$00,$00,$00,$00,$FF,$FF,$FF,$FF,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$18,$FF,$FF,$FF,$FF,$18,$18,$18,$18,$18,$18
-; Tictactoe sprites
-sprites: .DB $18,$18,$3C,$3C,$7E,$7E,$FF,$FF,$00,$00,$00,$00,$00,$00,$00,$00,$82,$82,$44,$44,$28,$28,$10,$10,$28,$28,$44,$44,$82,$82,$00,$00,$38,$38,$44,$44,$82,$82,$82,$82,$82,$82,$44,$44,$38,$38,$00,$00
+; Bigger copy loop - for copying into a section of RAM for counter > 255 (8 bits)
+; hl - output location
+; de - input location
+; bc - counter
+Big_copy_loop:
+	ld a, [de]
+	inc de
+	ld [hl+], a
+	dec bc
+	ld a, b
+	OR c
+	jr nz, Big_copy_loop
+    ret
 
+; Clearing loop - for clearing sections to nil (0-255 sections)
+; hl - section location
+; b - counter (0 - 255)
+Clear_loop:
+	ld [hl], c
+    inc hl
+	dec b
+	jr nz, Clear_loop
+    ret
+
+; Start the DMA transfer, write the source in RAM!
+DMA_transfer:
+	ld a, $C0 ; to change! where is the stuff!
+	ld [$FF46], a ; $C000 divided by $100
+	ld b, 40
+@DMA_wait:
+	dec b
+	jr nz, @DMA_wait
+	ret
+DMA_end: ; just for calculating size!
+
+; Tictactoe tiles
+tiles:
+    .DB $00,$00,$00,$00,$00,$00,$00,$00
+    .DB $00,$00,$00,$00,$00,$00,$00,$00
+    .DB $18,$18,$18,$18,$18,$18,$18,$18
+    .DB $18,$18,$18,$18,$18,$18,$18,$18
+    .DB $00,$00,$00,$00,$00,$00,$FF,$FF
+    .DB $FF,$FF,$00,$00,$00,$00,$00,$00
+    .DB $18,$18,$18,$18,$18,$18,$FF,$FF
+    .DB $FF,$FF,$18,$18,$18,$18,$18,$18
+    .DB $00,$00,$7C,$7C,$82,$82,$82,$82
+    .DB $82,$82,$FE,$FE,$82,$82,$82,$82
+    .DB $00,$00,$FC,$FC,$82,$82,$82,$82
+    .DB $FC,$FC,$82,$82,$82,$82,$FC,$FC
+    .DB $00,$00,$7C,$7C,$82,$82,$80,$80
+    .DB $80,$80,$80,$80,$82,$82,$7C,$7C
+    .DB $00,$00,$FC,$FC,$82,$82,$82,$82
+    .DB $82,$82,$82,$82,$82,$82,$FC,$FC
+    .DB $00,$00,$FE,$FE,$80,$80,$80,$80
+    .DB $FC,$FC,$80,$80,$80,$80,$FE,$FE
+    .DB $00,$00,$FE,$FE,$80,$80,$80,$80
+    .DB $F8,$F8,$80,$80,$80,$80,$80,$80
+    .DB $00,$00,$7C,$7C,$82,$82,$80,$80
+    .DB $9E,$9E,$82,$82,$82,$82,$7E,$7E
+    .DB $00,$00,$82,$82,$82,$82,$82,$82
+    .DB $FE,$FE,$82,$82,$82,$82,$82,$82
+    .DB $00,$00,$FE,$FE,$10,$10,$10,$10
+    .DB $10,$10,$10,$10,$10,$10,$FE,$FE
+    .DB $00,$00,$FE,$FE,$08,$08,$08,$08
+    .DB $08,$08,$08,$08,$88,$88,$70,$70
+    .DB $00,$00,$82,$82,$84,$84,$88,$88
+    .DB $F0,$F0,$88,$88,$84,$84,$82,$82
+    .DB $00,$00,$80,$80,$80,$80,$80,$80
+    .DB $80,$80,$80,$80,$80,$80,$FE,$FE
+    .DB $00,$00,$82,$82,$C6,$C6,$AA,$AA
+    .DB $92,$92,$82,$82,$82,$82,$82,$82
+    .DB $00,$00,$82,$82,$C2,$C2,$A2,$A2
+    .DB $92,$92,$8A,$8A,$86,$86,$82,$82
+    .DB $00,$00,$7C,$7C,$82,$82,$82,$82
+    .DB $82,$82,$82,$82,$82,$82,$7C,$7C
+    .DB $00,$00,$FC,$FC,$82,$82,$82,$82
+    .DB $FC,$FC,$80,$80,$80,$80,$80,$80
+    .DB $00,$00,$7C,$7C,$82,$82,$82,$82
+    .DB $92,$92,$8A,$8A,$86,$86,$7C,$7C
+    .DB $00,$00,$FC,$FC,$82,$82,$82,$82
+    .DB $82,$82,$FC,$FC,$82,$82,$82,$82
+    .DB $00,$00,$7C,$7C,$82,$82,$80,$80
+    .DB $7C,$7C,$02,$02,$82,$82,$7C,$7C
+    .DB $00,$00,$FE,$FE,$10,$10,$10,$10
+    .DB $10,$10,$10,$10,$10,$10,$10,$10
+    .DB $00,$00,$82,$82,$82,$82,$82,$82
+    .DB $82,$82,$82,$82,$82,$82,$7C,$7C
+    .DB $00,$00,$82,$82,$82,$82,$82,$82
+    .DB $82,$82,$44,$44,$28,$28,$10,$10
+    .DB $00,$00,$82,$82,$82,$82,$82,$82
+    .DB $92,$92,$92,$92,$AA,$AA,$44,$44
+    .DB $00,$00,$82,$82,$44,$44,$28,$28
+    .DB $10,$10,$28,$28,$44,$44,$82,$82
+    .DB $00,$00,$82,$82,$82,$82,$44,$44
+    .DB $28,$28,$10,$10,$10,$10,$10,$10
+    .DB $00,$00,$FE,$FE,$04,$04,$08,$08
+    .DB $10,$10,$20,$20,$40,$40,$FE,$FE
+
+; Tictactoe sprites
+sprites: 
+    .DB $18,$18,$3C,$3C,$7E,$7E,$FF,$FF
+    .DB $00,$00,$00,$00,$00,$00,$00,$00
+    .DB $82,$82,$44,$44,$28,$28,$10,$10
+    .DB $28,$28,$44,$44,$82,$82,$00,$00
+    .DB $38,$38,$44,$44,$82,$82,$82,$82
+    .DB $82,$82,$44,$44,$38,$38,$00,$00
+    .DB $08,$08,$0C,$0C,$0E,$0E,$0F,$0F
+    .DB $0F,$0F,$0E,$0E,$0C,$0C,$08,$08
 .ENDS
