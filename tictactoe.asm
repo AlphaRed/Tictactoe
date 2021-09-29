@@ -133,8 +133,18 @@ call $FF80
 
 MENU_LOOP:
 ; Input
+ld hl, $FF00
+res 5, [hl] ; set the bit to check button keys
+ld a, [hl]
+cpl
+and 1 ; check for A key
+cp 0
+call nz, move_it
+
 ; Logic
 ; Draw
+call Wait_vblank
+call $FF80
 jp MENU_LOOP
 
 ;call draw_board
@@ -146,3 +156,8 @@ jp GAME_LOOP
 	
 end:
 jp end
+
+move_it:
+	ld hl, $C000
+	ld [hl], $50 ; Y coord
+	ret
