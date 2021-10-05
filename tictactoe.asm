@@ -133,10 +133,7 @@ call $FF80
 
 MENU_LOOP:
 ; Input
-ld hl, $FF00
-res 5, [hl] ; set the bit to check button keys
-ld a, [hl]
-cpl
+call readinput
 and 1 ; check for A key
 cp 0
 call nz, move_it
@@ -160,4 +157,20 @@ jp end
 move_it:
 	ld hl, $C000
 	ld [hl], $50 ; Y coord
+	ret
+
+readinput:
+	ld a, 0 ; empty the A register
+	ld hl, $FF00
+	res 5, [hl] ; check other buttons first
+	ld a, [hl]
+	xor $FF; dump into the A register
+	sla a; shift (pads with zeros), do this four times...
+	sla a
+	sla a
+	sla a
+	cpl ; flip it
+	ld hl, $FF00 ; not sure if I need to load again
+	res 4, [hl] ; check directional buttons next
+	xor [hl]; dump into the A register
 	ret
