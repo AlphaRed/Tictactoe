@@ -167,6 +167,18 @@ DMA_transfer:
 	ret
 DMA_end: ; just for calculating size!
 
+; Clearing loop - for clearing sections to nil (larger than 8 bits)
+; hl - section location
+; bc - counter
+Big_clear_loop:
+	ld [hl], 0
+	inc hl
+	dec bc
+ 	ld a, b
+ 	OR c
+ 	jr nz, Big_clear_loop
+    ret
+
 ; Tictactoe tiles
 tiles:
     .DB $00,$00,$00,$00,$00,$00,$00,$00

@@ -1,6 +1,7 @@
 [objects]
 bin/tictactoe.o
 bin/gfx.o
+bin/input.o
 [libraries]
 [header]
 [footer]

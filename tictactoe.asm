@@ -134,9 +134,9 @@ call $FF80
 MENU_LOOP:
 ; Input
 call readinput
-and 1 ; check for A key
+and %00010000 ; check for A key
 cp 0
-call nz, move_it
+jp nz, GAME_SETUP
 
 ; Logic
 ; Draw
@@ -144,33 +144,63 @@ call Wait_vblank
 call $FF80
 jp MENU_LOOP
 
-;call draw_board
+GAME_SETUP:
+call Wait_vblank
+ld hl, $FF40
+res 7, [hl] ; reset the bit to turn off LCD
+; Clear the tilemap to zeros
+ld hl, $9800
+ld bc, 1024 ; 32 x 32 tilemap
+call Big_clear_loop
+
+; draw the game board!
+call draw_board
+
+; draw the cursor in the right spot
+ld hl, $C000
+ld [hl], $20 ; Y coord
+ld hl, $C000 + 1
+ld [hl], $0E ; X coord
+ld hl, $C000 + 2
+ld [hl], $00 ; tile num, change to a below arrow
+ld hl, $C000 + 3
+ld [hl], $00 ; attributes, keep zero for now
+
+call $FF80
+
+ld hl, $FF40
+set 7, [hl] ; set the bit to turn on LCD
+
+ld hl, $C100 ; set current location (can change this to somewhere else if needed)
+ld [hl], $01 ; top left is one, counting left to right and down
+
 GAME_LOOP:
 ; Input
+call readinput
+ld c, a
+@Input_loop:
+	call readinput ; loop until you let go
+	cp c
+	jr z, @Input_loop
+ld a, c ; load back in what you pressed
+
+ld b, a ; store
+and %00000001 ; check for right dpad
+cp 0
+call nz, move_right
+
+ld a, b ; need to replace value in A after each AND
+and %00000010 ; check for left dpad
+cp 0
+call nz, move_left
+
 ; Logic
+
 ; Draw
+call Wait_vblank
+call $FF80
+
 jp GAME_LOOP
 	
 end:
 jp end
-
-move_it:
-	ld hl, $C000
-	ld [hl], $50 ; Y coord
-	ret
-
-readinput:
-	ld a, 0 ; empty the A register
-	ld hl, $FF00
-	res 5, [hl] ; check other buttons first
-	ld a, [hl]
-	xor $FF; dump into the A register
-	sla a; shift (pads with zeros), do this four times...
-	sla a
-	sla a
-	sla a
-	cpl ; flip it
-	ld hl, $FF00 ; not sure if I need to load again
-	res 4, [hl] ; check directional buttons next
-	xor [hl]; dump into the A register
-	ret
