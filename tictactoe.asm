@@ -158,7 +158,7 @@ call draw_board
 
 ; draw the cursor in the right spot
 ld hl, $C000
-ld [hl], $20 ; Y coord
+ld [hl], $1F ; Y coord
 ld hl, $C000 + 1
 ld [hl], $0E ; X coord
 ld hl, $C000 + 2
@@ -193,6 +193,21 @@ ld a, b ; need to replace value in A after each AND
 and %00000010 ; check for left dpad
 cp 0
 call nz, move_left
+
+ld a, b ; need to replace value in A after each AND
+and %00000100 ; check for up dpad
+cp 0
+call nz, move_up
+
+ld a, b ; need to replace value in A after each AND
+and %00001000 ; check for up dpad
+cp 0
+call nz, move_down
+
+ld a, b ; need to replace value in A after each AND
+and %00010000 ; check for A button
+cp 0
+call nz, A_button
 
 ; Logic
 

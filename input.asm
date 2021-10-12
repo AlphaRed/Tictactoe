@@ -46,71 +46,384 @@ readinput:
 move_right:
     ld a, [$C100] ; find out where the cursor is
     cp 1
-    jr z, @First_col
+    jr z, @First_sq
 
     cp 2
-    jr z, @Second_col
+    jr z, @Second_sq
 
     cp 3
-    jr z, @Third_col
+    jr z, @Third_sq
+
+    cp 4
+    jr z, @Fourth_sq
+
+    cp 5
+    jr z, @Fifth_sq
+
+    cp 6
+    jr z, @Sixth_sq
+
+    cp 7
+    jr z, @Seventh_sq
+
+    cp 8
+    jr z, @Eighth_sq
+
+    cp 9
+    jr z, @Ninth_sq
 
     @End:
     ret
 
-    @First_col:
+    @First_sq:
 	    ld hl, $C000 + 1
 	    ld [hl], $24 ; X coord
         ld hl, $C100 ; don't forget to change location
         ld [hl], $02
         jr @End
 
-    @Second_col:
+    @Second_sq:
         ld hl, $C000 + 1
 	    ld [hl], $3A ; X coord
         ld hl, $C100 ; don't forget to change location
         ld [hl], $03
         jr @End
 
-    @Third_col:
+    @Third_sq:
         ld hl, $C000 + 1
 	    ld [hl], $0E ; X coord
         ld hl, $C100 ; don't forget to change location
         ld [hl], $01
+        jr @End
+
+    @Fourth_sq:
+        ld hl, $C000 + 1
+        ld [hl], $24 ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $05
+        jr @End
+    
+    @Fifth_sq:
+        ld hl, $C000 + 1
+        ld [hl], $3A ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $06
+        jr @End
+
+    @Sixth_sq:
+        ld hl, $C000 + 1
+        ld [hl], $0E ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $04
+        jr @End
+    
+    @Seventh_sq:
+        ld hl, $C000 + 1
+        ld [hl], $24 ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $08
+        jr @End
+    
+    @Eighth_sq:
+        ld hl, $C000 + 1
+        ld [hl], $3A ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $09
+        jr @End
+
+    @Ninth_sq:
+        ld hl, $C000 + 1
+        ld [hl], $0E ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $07
         jr @End
 
 move_left:
     ld a, [$C100] ; find out where the cursor is
     cp 1
-    jr z, @First_col
+    jr z, @First_sq
 
     cp 2
-    jr z, @Second_col
+    jr z, @Second_sq
 
     cp 3
-    jr z, @Third_col
+    jr z, @Third_sq
+
+    cp 4
+    jr z, @Fourth_sq
+
+    cp 5
+    jr z, @Fifth_sq
+
+    cp 6
+    jr z, @Sixth_sq
+
+    cp 7
+    jr z, @Seventh_sq
+
+    cp 8
+    jr z, @Eighth_sq
+
+    cp 9
+    jr z, @Ninth_sq
 
     @End:
     ret
 
-    @First_col:
+    @First_sq:
 	    ld hl, $C000 + 1
 	    ld [hl], $3A ; X coord
         ld hl, $C100 ; don't forget to change location
         ld [hl], $03
         jr @End
 
-    @Second_col:
+    @Second_sq:
         ld hl, $C000 + 1
 	    ld [hl], $0E ; X coord
         ld hl, $C100 ; don't forget to change location
         ld [hl], $01
         jr @End
 
-    @Third_col:
+    @Third_sq:
         ld hl, $C000 + 1
 	    ld [hl], $24 ; X coord
         ld hl, $C100 ; don't forget to change location
         ld [hl], $02
         jr @End
+    
+    @Fourth_sq:
+        ld hl, $C000 + 1
+	    ld [hl], $3A ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $06
+        jr @End
+
+    @Fifth_sq:
+        ld hl, $C000 + 1
+	    ld [hl], $0E ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $04
+        jr @End
+    
+    @Sixth_sq:
+        ld hl, $C000 + 1
+	    ld [hl], $24 ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $05
+        jr @End
+    
+    @Seventh_sq:
+        ld hl, $C000 + 1
+	    ld [hl], $3A ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $09
+        jr @End
+    
+    @Eighth_sq:
+        ld hl, $C000 + 1
+	    ld [hl], $0E ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $07
+        jr @End
+    
+    @Ninth_sq:
+        ld hl, $C000 + 1
+	    ld [hl], $24 ; X coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $08
+        jr @End
+
+move_up:
+    ld a, [$C100] ; find out where the cursor is
+    cp 1
+    jr z, @First_sq
+
+    cp 2
+    jr z, @Second_sq
+
+    cp 3
+    jr z, @Third_sq
+
+    cp 4
+    jr z, @Fourth_sq
+
+    cp 5
+    jr z, @Fifth_sq
+
+    cp 6
+    jr z, @Sixth_sq
+
+    cp 7
+    jr z, @Seventh_sq
+
+    cp 8
+    jr z, @Eighth_sq
+
+    cp 9
+    jr z, @Ninth_sq
+
+    @End:
+    ret
+
+    @First_sq:
+	    ld hl, $C000
+	    ld [hl], $4C ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $07
+        jr @End
+
+    @Second_sq:
+	    ld hl, $C000
+	    ld [hl], $4C ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $08
+        jr @End
+
+    @Third_sq:
+	    ld hl, $C000
+	    ld [hl], $4C ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $09
+        jr @End
+
+    @Fourth_sq:
+        ld hl, $C000
+	    ld [hl], $1F ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $01
+        jr @End
+
+    @Fifth_sq:
+        ld hl, $C000
+	    ld [hl], $1F ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $02
+        jr @End
+
+    @Sixth_sq:
+        ld hl, $C000
+	    ld [hl], $1F ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $03
+        jr @End
+
+    @Seventh_sq:
+        ld hl, $C000
+	    ld [hl], $37 ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $04
+        jr @End
+
+    @Eighth_sq:
+        ld hl, $C000
+	    ld [hl], $37 ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $05
+        jr @End
+    
+    @Ninth_sq:
+        ld hl, $C000
+	    ld [hl], $37 ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $06
+        jr @End
+    
+move_down:
+    ld a, [$C100] ; find out where the cursor is
+    cp 1
+    jr z, @First_sq
+
+    cp 2
+    jr z, @Second_sq
+
+    cp 3
+    jr z, @Third_sq
+
+    cp 4
+    jr z, @Fourth_sq
+
+    cp 5
+    jr z, @Fifth_sq
+
+    cp 6
+    jr z, @Sixth_sq
+
+    cp 7
+    jr z, @Seventh_sq
+
+    cp 8
+    jr z, @Eighth_sq
+
+    cp 9
+    jr z, @Ninth_sq
+
+    @End:
+    ret
+
+    @First_sq:
+	    ld hl, $C000
+	    ld [hl], $37 ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $04
+        jr @End
+
+    @Second_sq:
+	    ld hl, $C000
+	    ld [hl], $37 ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $05
+        jr @End
+
+    @Third_sq:
+	    ld hl, $C000
+	    ld [hl], $37 ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $06
+        jr @End
+
+    @Fourth_sq:
+        ld hl, $C000
+	    ld [hl], $4C ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $07
+        jr @End
+
+    @Fifth_sq:
+        ld hl, $C000
+	    ld [hl], $4C ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $08
+        jr @End
+
+    @Sixth_sq:
+        ld hl, $C000
+	    ld [hl], $4C ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $09
+        jr @End
+
+    @Seventh_sq:
+        ld hl, $C000
+	    ld [hl], $1F ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $01
+        jr @End
+
+    @Eighth_sq:
+        ld hl, $C000
+	    ld [hl], $1F ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $02
+        jr @End
+    
+    @Ninth_sq:
+        ld hl, $C000
+	    ld [hl], $1F ; Y coord
+        ld hl, $C100 ; don't forget to change location
+        ld [hl], $03
+        jr @End
+
+    A_button: ; to do
+    ret
 
 .ENDS
