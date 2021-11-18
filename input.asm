@@ -20,11 +20,14 @@ SLOT 1 $4000
 .BANK 0
 .SECTION "input" FREE
 
+; includes
+.INCLUDE "variables.i"
+
 ; Read input function - reads the input of all eight buttons and returns in A register
 ; (1 being pressed and 0 being not pressed)
 
-readinput:
-	ld hl, $FF00
+read_input:
+	ld hl, JOYPAD
 	ld [hl], %11011111 ; check buttons (not Dpad) first
 	ld a, [hl]
 	ld a, [hl]
@@ -44,7 +47,7 @@ readinput:
 	ret
 
 move_right:
-    ld a, [$C100] ; find out where the cursor is
+    ld a, [CURSOR_LOC] ; find out where the cursor is
     cp 1
     jr z, @First_sq
 
@@ -76,70 +79,70 @@ move_right:
     ret
 
     @First_sq:
-	    ld hl, $C000 + 1
+	    ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $24 ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $02
         jr @End
 
     @Second_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $3A ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $03
         jr @End
 
     @Third_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $0E ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $01
         jr @End
 
     @Fourth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
         ld [hl], $24 ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $05
         jr @End
     
     @Fifth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
         ld [hl], $3A ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $06
         jr @End
 
     @Sixth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
         ld [hl], $0E ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $04
         jr @End
     
     @Seventh_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
         ld [hl], $24 ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $08
         jr @End
     
     @Eighth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
         ld [hl], $3A ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $09
         jr @End
 
     @Ninth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
         ld [hl], $0E ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $07
         jr @End
 
 move_left:
-    ld a, [$C100] ; find out where the cursor is
+    ld a, [CURSOR_LOC] ; find out where the cursor is
     cp 1
     jr z, @First_sq
 
@@ -171,70 +174,70 @@ move_left:
     ret
 
     @First_sq:
-	    ld hl, $C000 + 1
+	    ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $3A ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $03
         jr @End
 
     @Second_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $0E ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $01
         jr @End
 
     @Third_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $24 ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $02
         jr @End
     
     @Fourth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $3A ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $06
         jr @End
 
     @Fifth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $0E ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $04
         jr @End
     
     @Sixth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $24 ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $05
         jr @End
     
     @Seventh_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $3A ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $09
         jr @End
     
     @Eighth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $0E ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $07
         jr @End
     
     @Ninth_sq:
-        ld hl, $C000 + 1
+        ld hl, SPRITE_CURSOR + 1
 	    ld [hl], $24 ; X coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $08
         jr @End
 
 move_up:
-    ld a, [$C100] ; find out where the cursor is
+    ld a, [CURSOR_LOC] ; find out where the cursor is
     cp 1
     jr z, @First_sq
 
@@ -266,70 +269,70 @@ move_up:
     ret
 
     @First_sq:
-	    ld hl, $C000
+	    ld hl, SPRITE_CURSOR
 	    ld [hl], $4C ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $07
         jr @End
 
     @Second_sq:
-	    ld hl, $C000
+	    ld hl, SPRITE_CURSOR
 	    ld [hl], $4C ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $08
         jr @End
 
     @Third_sq:
-	    ld hl, $C000
+	    ld hl, SPRITE_CURSOR
 	    ld [hl], $4C ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $09
         jr @End
 
     @Fourth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $1F ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $01
         jr @End
 
     @Fifth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $1F ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $02
         jr @End
 
     @Sixth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $1F ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $03
         jr @End
 
     @Seventh_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $37 ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $04
         jr @End
 
     @Eighth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $37 ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $05
         jr @End
     
     @Ninth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $37 ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $06
         jr @End
     
 move_down:
-    ld a, [$C100] ; find out where the cursor is
+    ld a, [CURSOR_LOC] ; find out where the cursor is
     cp 1
     jr z, @First_sq
 
@@ -361,69 +364,87 @@ move_down:
     ret
 
     @First_sq:
-	    ld hl, $C000
+	    ld hl, SPRITE_CURSOR
 	    ld [hl], $37 ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $04
         jr @End
 
     @Second_sq:
-	    ld hl, $C000
+	    ld hl, SPRITE_CURSOR
 	    ld [hl], $37 ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $05
         jr @End
 
     @Third_sq:
-	    ld hl, $C000
+	    ld hl, SPRITE_CURSOR
 	    ld [hl], $37 ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $06
         jr @End
 
     @Fourth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $4C ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $07
         jr @End
 
     @Fifth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $4C ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $08
         jr @End
 
     @Sixth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $4C ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $09
         jr @End
 
     @Seventh_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $1F ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $01
         jr @End
 
     @Eighth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $1F ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $02
         jr @End
     
     @Ninth_sq:
-        ld hl, $C000
+        ld hl, SPRITE_CURSOR
 	    ld [hl], $1F ; Y coord
-        ld hl, $C100 ; don't forget to change location
+        ld hl, CURSOR_LOC ; don't forget to change location
         ld [hl], $03
         jr @End
 
-    A_button: ; to do
+A_button: ; very much work-in-progress
+    ld a, [CURSOR_LOC] ; find out where the cursor is
+    cp 1
+    jr z, @First_sq
+
+    @End:
     ret
+
+    @First_sq:
+	    ld hl, SPRITE_X
+	    ld [hl], $16 ; Y coord
+        ld hl, SPRITE_X + 1
+	    ld [hl], $0E ; X coord
+        ld hl, SPRITE_X + 2
+	    ld [hl], $01 ; tile number
+        ld hl, SPRITE_X + 3
+	    ld [hl], $00 ; attributes
+        ld hl, TURN ; end your turn
+        ld [hl], $02
+        jr @End
 
 .ENDS

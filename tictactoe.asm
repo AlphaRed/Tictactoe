@@ -19,6 +19,9 @@ SLOT 1 $4000
 
 .BANK 0 SLOT 0
 
+; includes
+.INCLUDE "variables.i"
+
 ; Interrupts
 .ORG $0040 ; Vblank
 	;call $FF80 ; do the DMA transfer since the board won't need to change
@@ -45,12 +48,12 @@ jp start
 .ORG $0150
 start:
 
-call Wait_vblank
-ld hl, $FF40
+call wait_vblank
+ld hl, LCDC
 res 7, [hl] ; reset the bit to turn off LCD
 
 ; Clear the tilemap to zeros
-ld hl, $9800
+ld hl, BGTILES
 ld bc, 1024 ; 32 x 32 tilemap
 other_clear_loop:
 	ld [hl], 0
@@ -61,127 +64,136 @@ other_clear_loop:
  	jr nz, other_clear_loop
 
 ; Load the tiles into VRAM
-ld hl, $9000
+ld hl, $9000 ; WHAT IS THIS FOR?
 ld de, tiles
 ld bc, 480 ; thirty tiles (16 x 30)
-call Big_copy_loop
+call big_copy_loop
 
 ; Clear OAM to zeros
-ld hl, $FE00
+ld hl, OAMTBL
 ld b, 160 ; 40 sprites x 4 bytes
-call Clear_loop
+call clear_loop
 
 ; Load the sprites into VRAM
-ld hl, $8000 ;
+ld hl, $8000
 ld de, sprites
 ld b, 64 ; four sprites (16 x 4)
-call Copy_loop
+call copy_loop
 
 ; Set where it looks for BG tilemap (also turn on sprites)
-ld hl, $FF40
+ld hl, LCDC
 ld [hl], $83
 
 ; Set the palette, super basic one for now
-ld hl, $FF47 
+ld hl, BGPAL
 ld [hl], $E4
 
 ; Set the sprite palette
-ld hl, $FF48
+ld hl, SPRPAL
 ld [hl], $E4
 
-call Wait_vblank ; not sure I need this but will just for safety
+call wait_vblank ; not sure I need this but will just for safety
 
 ; DMA copy routine!
-ld hl, $FF80 ; to HRAM
+ld hl, HRAM ; to HRAM
 ld de, DMA_transfer
 ld b, DMA_end - DMA_transfer ; how big is it?
-call Copy_loop
+call copy_loop
 
 ; Clear RAM area for OAM for DMA transfer!
-ld hl, $C000
+ld hl, SPRITE_AREA
 ld b, 160 ; 40 sprites x 4 bytes
-call Clear_loop
+call clear_loop
 
 ; Setup RAM area for DMA transfer
-ld hl, $C000
+ld hl, SPRITE_AREA
 ld [hl], $20 ; Y coord
-ld hl, $C000 + 1
+ld hl, SPRITE_AREA + 1
 ld [hl], $10 ; X coord
-ld hl, $C000 + 2
+ld hl, SPRITE_AREA + 2
 ld [hl], $00 ; tile num
-ld hl, $C000 + 3
+ld hl, SPRITE_AREA + 3
 ld [hl], $00 ; attributes, keep zero for now
 
-;call $FF80 ; for testing purposes
-
-call Wait_vblank
+call wait_vblank
 
 call draw_menu
 
 ; Set the default cursor
 draw_menu_cursor:
-	ld hl, $C000
+	ld hl, SPRITE_AREA
 	ld [hl], $40 ; Y coord
-	ld hl, $C000 + 1
+	ld hl, SPRITE_AREA + 1
 	ld [hl], $30 ; X coord
-	ld hl, $C000 + 2
+	ld hl, SPRITE_AREA + 2
 	ld [hl], $03 ; tile num
-	ld hl, $C000 + 3
+	ld hl, SPRITE_AREA + 3
 	ld [hl], $00 ; attributes, keep zero for now
 
-call $FF80
+call HRAM
 
-MENU_LOOP:
+menu_loop:
 ; Input
-call readinput
+call read_input
 and %00010000 ; check for A key
 cp 0
-jp nz, GAME_SETUP
+jp nz, game_setup
 
 ; Logic
 ; Draw
-call Wait_vblank
-call $FF80
-jp MENU_LOOP
+call wait_vblank
+call HRAM
+jp menu_loop
 
-GAME_SETUP:
-call Wait_vblank
-ld hl, $FF40
+game_setup:
+call wait_vblank
+ld hl, LCDC
 res 7, [hl] ; reset the bit to turn off LCD
 ; Clear the tilemap to zeros
-ld hl, $9800
+ld hl, BGTILES
 ld bc, 1024 ; 32 x 32 tilemap
-call Big_clear_loop
+call big_clear_loop
 
 ; draw the game board!
 call draw_board
 
 ; draw the cursor in the right spot
-ld hl, $C000
+ld hl, SPRITE_CURSOR
 ld [hl], $1F ; Y coord
-ld hl, $C000 + 1
+ld hl, SPRITE_CURSOR + 1
 ld [hl], $0E ; X coord
-ld hl, $C000 + 2
+ld hl, SPRITE_CURSOR + 2
 ld [hl], $00 ; tile num, change to a below arrow
-ld hl, $C000 + 3
+ld hl, SPRITE_CURSOR + 3
 ld [hl], $00 ; attributes, keep zero for now
 
-call $FF80
+call HRAM
 
-ld hl, $FF40
+ld hl, LCDC
 set 7, [hl] ; set the bit to turn on LCD
 
-ld hl, $C100 ; set current location (can change this to somewhere else if needed)
+ld hl, CURSOR_LOC ; set current location (can change this to somewhere else if needed)
 ld [hl], $01 ; top left is one, counting left to right and down
 
-GAME_LOOP:
+ld hl, TURN ; set player turn (Human = 1, CPU = 2), if I decide to add two player this will need to change
+ld [hl], $02 ; Humans first boyzzz
+
+ld hl, BOARD_MAP ; clear map of board for inputing Xs and Os
+ld b, 9
+call clear_loop
+
+game_loop:
 ; Input
-call readinput
+ld a, [TURN] ; check who's turn it is
+cp 2
+jr z, @CPU_turn
+
+call read_input
 ld c, a
-@Input_loop:
-	call readinput ; loop until you let go
+@input_loop:
+	call read_input ; loop until you let go
 	cp c
-	jr z, @Input_loop
+	jr z, @input_loop
 ld a, c ; load back in what you pressed
 
 ld b, a ; store
@@ -210,12 +222,23 @@ cp 0
 call nz, A_button
 
 ; Logic
+@CPU_turn:
+	ld hl, SPRITE_AREA + 4
+	ld [hl], $16 ; Y coord
+    ld hl, SPRITE_AREA + 4 + 1
+	ld [hl], $0E ; X coord
+    ld hl, SPRITE_AREA + 4 + 2
+	ld [hl], $02 ; tile number
+    ld hl, SPRITE_AREA + 4 + 3
+	ld [hl], $00 ; attributes
+    ld hl, $C101 ; end your turn
+    ld [hl], $01
 
 ; Draw
-call Wait_vblank
-call $FF80
+call wait_vblank
+call HRAM
 
-jp GAME_LOOP
+jp game_loop
 	
 end:
 jp end

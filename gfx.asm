@@ -20,103 +20,106 @@ SLOT 1 $4000
 .BANK 0
 .SECTION "gfx" FREE
 
+; includes
+.INCLUDE "variables.i"
+
 ; Wait_vblank - for checking if in v-blank and waiting until it starts if not
 ; No inputs
-Wait_vblank:
-	ld a, ($FF44) ; grab horizontal line draw and compare with 145
+wait_vblank:
+	ld a, [LCDY] ; grab horizontal line draw and compare with 145
 	cp 145
-	jr nz, Wait_vblank
+	jr nz, wait_vblank
     ret
 
 ; Draw the board function
 draw_board:
-    ld hl, $9800 + 2
+    ld hl, BGTILES + 2
     ld [hl], 1
-    ld hl, $9800 + 5
+    ld hl, BGTILES + 5
     ld [hl], 1
-    ld hl, $9800 + 32 + 2
+    ld hl, BGTILES + 32 + 2
     ld [hl], 1
-    ld hl, $9800 + 32 + 5
+    ld hl, BGTILES + 32 + 5
     ld [hl], 1
-    ld hl, $9800 + 64
+    ld hl, BGTILES + 64
     ld [hl], 2
-    ld hl, $9800 + 64 + 1
+    ld hl, BGTILES + 64 + 1
     ld [hl], 2
-    ld hl, $9800 + 64 + 2
+    ld hl, BGTILES + 64 + 2
     ld [hl], 3
-    ld hl, $9800 + 64 + 3
+    ld hl, BGTILES + 64 + 3
     ld [hl], 2
-    ld hl, $9800 + 64 + 4
+    ld hl, BGTILES + 64 + 4
     ld [hl], 2
-    ld hl, $9800 + 64 + 5
+    ld hl, BGTILES + 64 + 5
     ld [hl], 3
-    ld hl, $9800 + 64 + 6
+    ld hl, BGTILES + 64 + 6
     ld [hl], 2
-    ld hl, $9800 + 64 + 7
+    ld hl, BGTILES + 64 + 7
     ld [hl], 2
-    ld hl, $9800 + 96 + 2
+    ld hl, BGTILES + 96 + 2
     ld [hl], 1
-    ld hl, $9800 + 96 + 5
+    ld hl, BGTILES + 96 + 5
     ld [hl], 1
-    ld hl, $9800 + 128 + 2
+    ld hl, BGTILES + 128 + 2
     ld [hl], 1
-    ld hl, $9800 + 128 + 5
+    ld hl, BGTILES + 128 + 5
     ld [hl], 1
-    ld hl, $9800 + 160
+    ld hl, BGTILES + 160
     ld [hl], 2
-    ld hl, $9800 + 160 + 1
+    ld hl, BGTILES + 160 + 1
     ld [hl], 2
-    ld hl, $9800 + 160 + 2
+    ld hl, BGTILES + 160 + 2
     ld [hl], 3
-    ld hl, $9800 + 160 + 3
+    ld hl, BGTILES + 160 + 3
     ld [hl], 2
-    ld hl, $9800 + 160 + 4
+    ld hl, BGTILES + 160 + 4
     ld [hl], 2
-    ld hl, $9800 + 160 + 5
+    ld hl, BGTILES + 160 + 5
     ld [hl], 3
-    ld hl, $9800 + 160 + 6
+    ld hl, BGTILES + 160 + 6
     ld [hl], 2
-    ld hl, $9800 + 160 + 7
+    ld hl, BGTILES + 160 + 7
     ld [hl], 2
-    ld hl, $9800 + 192 + 2
+    ld hl, BGTILES + 192 + 2
     ld [hl], 1
-    ld hl, $9800 + 192 + 5
+    ld hl, BGTILES + 192 + 5
     ld [hl], 1
-    ld hl, $9800 + 224 + 2
+    ld hl, BGTILES + 224 + 2
     ld [hl], 1
-    ld hl, $9800 + 224 + 5
+    ld hl, BGTILES + 224 + 5
     ld [hl], 1
     ret
 
 ; Draw the menu function
 draw_menu:
-	ld hl, $9800 + (32 * 4) + 5 ; T
+	ld hl, BGTILES + (32 * 4) + 5 ; T
     ld [hl], 23
-	ld hl, $9800 + (32 * 4) + 6 ; I
+	ld hl, BGTILES + (32 * 4) + 6 ; I
     ld [hl], 12
-	ld hl, $9800 + (32 * 4) + 7 ; C
+	ld hl, BGTILES + (32 * 4) + 7 ; C
     ld [hl], 6
-	ld hl, $9800 + (32 * 4) + 8 ; T
+	ld hl, BGTILES + (32 * 4) + 8 ; T
     ld [hl], 23
-	ld hl, $9800 + (32 * 4) + 9 ; A
+	ld hl, BGTILES + (32 * 4) + 9 ; A
     ld [hl], 4
-	ld hl, $9800 + (32 * 4) + 10 ; C
+	ld hl, BGTILES + (32 * 4) + 10 ; C
     ld [hl], 6
-	ld hl, $9800 + (32 * 4) + 11 ; T
+	ld hl, BGTILES + (32 * 4) + 11 ; T
     ld [hl], 23
-	ld hl, $9800 + (32 * 4) + 12 ; O
+	ld hl, BGTILES + (32 * 4) + 12 ; O
     ld [hl], 18
-	ld hl, $9800 + (32 * 4) + 13 ; E
+	ld hl, BGTILES + (32 * 4) + 13 ; E
     ld [hl], 8
-	ld hl, $9800 + (32 * 6) + 7 ; S
+	ld hl, BGTILES + (32 * 6) + 7 ; S
     ld [hl], 22
-	ld hl, $9800 + (32 * 6) + 8 ; T
+	ld hl, BGTILES + (32 * 6) + 8 ; T
     ld [hl], 23
-	ld hl, $9800 + (32 * 6) + 9 ; A
+	ld hl, BGTILES + (32 * 6) + 9 ; A
     ld [hl], 4
-	ld hl, $9800 + (32 * 6) + 10 ; R
+	ld hl, BGTILES + (32 * 6) + 10 ; R
     ld [hl], 21
-	ld hl, $9800 + (32 * 6) + 11 ; T
+	ld hl, BGTILES + (32 * 6) + 11 ; T
     ld [hl], 23
     ret
 
@@ -124,36 +127,36 @@ draw_menu:
 ; hl - output location
 ; de - input location
 ; b - counter
-Copy_loop:
+copy_loop:
 	ld a, [de]
 	inc de
 	ld [hl+], a
 	dec b
-	jr nz, Copy_loop
+	jr nz, copy_loop
     ret
 
 ; Bigger copy loop - for copying into a section of RAM for counter > 255 (8 bits)
 ; hl - output location
 ; de - input location
 ; bc - counter
-Big_copy_loop:
+big_copy_loop:
 	ld a, [de]
 	inc de
 	ld [hl+], a
 	dec bc
 	ld a, b
 	OR c
-	jr nz, Big_copy_loop
+	jr nz, big_copy_loop
     ret
 
 ; Clearing loop - for clearing sections to nil (0-255 sections)
 ; hl - section location
 ; b - counter (0 - 255)
-Clear_loop:
+clear_loop:
 	ld [hl], c
     inc hl
 	dec b
-	jr nz, Clear_loop
+	jr nz, clear_loop
     ret
 
 ; Start the DMA transfer, write the source in RAM!
@@ -170,13 +173,13 @@ DMA_end: ; just for calculating size!
 ; Clearing loop - for clearing sections to nil (larger than 8 bits)
 ; hl - section location
 ; bc - counter
-Big_clear_loop:
+big_clear_loop:
 	ld [hl], 0
 	inc hl
 	dec bc
  	ld a, b
  	OR c
- 	jr nz, Big_clear_loop
+ 	jr nz, big_clear_loop
     ret
 
 ; Tictactoe tiles
