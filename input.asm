@@ -431,19 +431,236 @@ A_button: ; very much work-in-progress
     cp 1
     jr z, @First_sq
 
+    cp 2
+    jr z, @Second_sq
+
+    cp 3
+    jr z, @Third_sq
+
+    cp 4
+    jr z, @Fourth_sq
+
+    cp 5
+    jr z, @Fifth_sq
+
+    cp 6
+    jr z, @Sixth_sq
+
+    cp 7
+    jr z, @Seventh_sq
+
+    cp 8
+    jr z, @Eighth_sq
+
+    cp 9
+    jr z, @Ninth_sq
+
     @End:
-    ret
+        ld hl, SQ_CHOSEN
+        ld [hl], $01
+        ret
 
     @First_sq:
-	    ld hl, SPRITE_X
-	    ld [hl], $16 ; Y coord
-        ld hl, SPRITE_X + 1
-	    ld [hl], $0E ; X coord
-        ld hl, SPRITE_X + 2
-	    ld [hl], $01 ; tile number
-        ld hl, SPRITE_X + 3
-	    ld [hl], $00 ; attributes
-        ld hl, TURN ; end your turn
+        ld hl, SPRITE_1 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP ; update the map
+        ld [hl], $01
+        jr @End
+
+    @Second_sq:
+        ld hl, SPRITE_2 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP + 1 ; update the map
+        ld [hl], $01
+        jr @End
+
+    @Third_sq:
+        ld hl, SPRITE_3 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP + 2 ; update the map
+        ld [hl], $01
+        jr @End
+
+    @Fourth_sq:
+        ld hl, SPRITE_4 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP + 3 ; update the map
+        ld [hl], $01
+        jr @End
+
+    @Fifth_sq:
+        ld hl, SPRITE_5 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP + 4; update the map
+        ld [hl], $01
+        jr @End
+
+    @Sixth_sq:
+        ld hl, SPRITE_6 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP + 5 ; update the map
+        ld [hl], $01
+        jr @End
+
+    @Seventh_sq:
+        ld hl, SPRITE_7 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP + 6 ; update the map
+        ld [hl], $01
+        jr @End
+
+    @Eighth_sq:
+        ld hl, SPRITE_8 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP + 7 ; update the map
+        ld [hl], $01
+        jr @End
+
+    @Ninth_sq:
+        ld hl, SPRITE_9 + 2 ; change the sprite
+        ld [hl], $01
+        ld hl, BOARD_MAP + 8 ; update the map
+        ld [hl], $01
+        jr @End
+
+player_input:
+    call read_input
+    ld c, a
+    @input_loop:
+	    call read_input ; loop until you let go
+	    cp c
+	    jr z, @input_loop
+    ld a, c ; load back in what you pressed
+
+    ld b, a ; store
+    and %00000001 ; check for right dpad
+    cp 0
+    call nz, move_right
+
+    ld a, b ; need to replace value in A after each AND
+    and %00000010 ; check for left dpad
+    cp 0
+    call nz, move_left
+
+    ld a, b ; need to replace value in A after each AND
+    and %00000100 ; check for up dpad
+    cp 0
+    call nz, move_up
+
+    ld a, b ; need to replace value in A after each AND
+    and %00001000 ; check for up dpad
+    cp 0
+    call nz, move_down
+
+    ld a, b ; need to replace value in A after each AND
+    and %00010000 ; check for A button
+    cp 0
+    call nz, A_button
+
+    ret
+
+CPU_input: ; might want to make the CPU move the cursor in the future?
+    ld a, [BOARD_MAP]
+    cp 0
+    jr z, @First_sq
+
+    ld a, [BOARD_MAP + 1]
+    cp 0
+    jr z, @Second_sq
+
+    ld a, [BOARD_MAP + 2]
+    cp 0
+    jr z, @Third_sq
+
+    ld a, [BOARD_MAP + 3]
+    cp 0
+    jr z, @Fourth_sq
+
+    ld a, [BOARD_MAP + 4]
+    cp 0
+    jr z, @Fifth_sq
+
+    ld a, [BOARD_MAP + 5]
+    cp 0
+    jr z, @Sixth_sq
+
+    ld a, [BOARD_MAP + 6]
+    cp 0
+    jr z, @Seventh_sq
+
+    ld a, [BOARD_MAP + 7]
+    cp 0
+    jr z, @Eighth_sq
+
+    ld a, [BOARD_MAP + 8]
+    cp 0
+    jr z, @Ninth_sq
+
+    @End:
+        ld hl, SQ_CHOSEN
+        ld [hl], $01
+        ret
+
+    @First_sq:
+        ld hl, SPRITE_1 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP
+        ld [hl], $02
+        jr @End
+
+    @Second_sq:
+        ld hl, SPRITE_2 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP + 1
+        ld [hl], $02
+        jr @End
+    
+    @Third_sq:
+        ld hl, SPRITE_3 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP + 2
+        ld [hl], $02
+        jr @End
+
+    @Fourth_sq:
+        ld hl, SPRITE_4 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP + 3
+        ld [hl], $02
+        jr @End
+
+    @Fifth_sq:
+        ld hl, SPRITE_5 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP + 4
+        ld [hl], $02
+        jr @End
+    
+    @Sixth_sq:
+        ld hl, SPRITE_6 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP + 5
+        ld [hl], $02
+        jr @End
+
+    @Seventh_sq:
+        ld hl, SPRITE_7 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP + 6
+        ld [hl], $02
+        jr @End
+
+    @Eighth_sq:
+        ld hl, SPRITE_8 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP + 7
+        ld [hl], $02
+        jr @End
+    
+    @Ninth_sq:
+        ld hl, SPRITE_9 + 2 ; change the sprite
+        ld [hl], $02
+        ld hl, BOARD_MAP + 8
         ld [hl], $02
         jr @End
 

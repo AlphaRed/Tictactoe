@@ -182,6 +182,90 @@ big_clear_loop:
  	jr nz, big_clear_loop
     ret
 
+; Draws sprites for board - start out empty sprites and change to Xs and Os
+draw_board_sprites:
+    ld hl, SPRITE_1
+    ld [hl], $16 ; Y coord
+    ld hl, SPRITE_1 + 1
+    ld [hl], $0E ; X coord
+    ld hl, SPRITE_1 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_1 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+
+    ld hl, SPRITE_2
+    ld [hl], $16 ; Y coord
+    ld hl, SPRITE_2 + 1
+    ld [hl], $24 ; X coord
+    ld hl, SPRITE_2 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_2 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+
+    ld hl, SPRITE_3
+    ld [hl], $16 ; Y coord
+    ld hl, SPRITE_3 + 1
+    ld [hl], $3B ; X coord
+    ld hl, SPRITE_3 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_3 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+
+    ld hl, SPRITE_4
+    ld [hl], $2D ; Y coord
+    ld hl, SPRITE_4 + 1
+    ld [hl], $0E ; X coord
+    ld hl, SPRITE_4 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_4 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+
+    ld hl, SPRITE_5
+    ld [hl], $2D ; Y coord
+    ld hl, SPRITE_5 + 1
+    ld [hl], $24 ; X coord
+    ld hl, SPRITE_5 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_5 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+
+    ld hl, SPRITE_6
+    ld [hl], $2D ; Y coord
+    ld hl, SPRITE_6 + 1
+    ld [hl], $3B ; X coord
+    ld hl, SPRITE_6 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_6 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+
+    ld hl, SPRITE_7
+    ld [hl], $43 ; Y coord
+    ld hl, SPRITE_7 + 1
+    ld [hl], $0E ; X coord
+    ld hl, SPRITE_7 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_7 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+
+    ld hl, SPRITE_8
+    ld [hl], $43 ; Y coord
+    ld hl, SPRITE_8 + 1
+    ld [hl], $24 ; X coord
+    ld hl, SPRITE_8 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_8 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+
+    ld hl, SPRITE_9
+    ld [hl], $43 ; Y coord
+    ld hl, SPRITE_9 + 1
+    ld [hl], $3B ; X coord
+    ld hl, SPRITE_9 + 2
+    ld [hl], $04 ; tile num, use empty sprite
+    ld hl, SPRITE_9 + 3
+    ld [hl], $00 ; attributes, keep zero for now
+    ret
+
 ; Tictactoe tiles
 tiles:
     .DB $00,$00,$00,$00,$00,$00,$00,$00
@@ -255,4 +339,6 @@ sprites:
     .DB $82,$82,$44,$44,$38,$38,$00,$00
     .DB $08,$08,$0C,$0C,$0E,$0E,$0F,$0F
     .DB $0F,$0F,$0E,$0E,$0C,$0C,$08,$08
+    .DB $00,$00,$00,$00,$00,$00,$00,$00
+    .DB $00,$00,$00,$00,$00,$00,$00,$00
 .ENDS

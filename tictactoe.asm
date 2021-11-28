@@ -77,7 +77,7 @@ call clear_loop
 ; Load the sprites into VRAM
 ld hl, $8000
 ld de, sprites
-ld b, 64 ; four sprites (16 x 4)
+ld b, 80 ; five sprites (16 x 5)
 call copy_loop
 
 ; Set where it looks for BG tilemap (also turn on sprites)
@@ -157,6 +157,9 @@ call big_clear_loop
 ; draw the game board!
 call draw_board
 
+; draw empty sprites for board
+call draw_board_sprites
+
 ; draw the cursor in the right spot
 ld hl, SPRITE_CURSOR
 ld [hl], $1F ; Y coord
@@ -176,69 +179,68 @@ ld hl, CURSOR_LOC ; set current location (can change this to somewhere else if n
 ld [hl], $01 ; top left is one, counting left to right and down
 
 ld hl, TURN ; set player turn (Human = 1, CPU = 2), if I decide to add two player this will need to change
-ld [hl], $02 ; Humans first boyzzz
+ld [hl], $01 ; Humans first boyzzz
 
 ld hl, BOARD_MAP ; clear map of board for inputing Xs and Os
 ld b, 9
 call clear_loop
 
+ld hl, SQ_CHOSEN
+ld [hl], $00
+
 game_loop:
 ; Input
-ld a, [TURN] ; check who's turn it is
+ld a, [TURN]
+cp 1
+call z, player_input ; player's turn
+
+ld a, [TURN]
 cp 2
-jr z, @CPU_turn
-
-call read_input
-ld c, a
-@input_loop:
-	call read_input ; loop until you let go
-	cp c
-	jr z, @input_loop
-ld a, c ; load back in what you pressed
-
-ld b, a ; store
-and %00000001 ; check for right dpad
-cp 0
-call nz, move_right
-
-ld a, b ; need to replace value in A after each AND
-and %00000010 ; check for left dpad
-cp 0
-call nz, move_left
-
-ld a, b ; need to replace value in A after each AND
-and %00000100 ; check for up dpad
-cp 0
-call nz, move_up
-
-ld a, b ; need to replace value in A after each AND
-and %00001000 ; check for up dpad
-cp 0
-call nz, move_down
-
-ld a, b ; need to replace value in A after each AND
-and %00010000 ; check for A button
-cp 0
-call nz, A_button
+call z, CPU_input ; CPU's turn
 
 ; Logic
-@CPU_turn:
-	ld hl, SPRITE_AREA + 4
-	ld [hl], $16 ; Y coord
-    ld hl, SPRITE_AREA + 4 + 1
-	ld [hl], $0E ; X coord
-    ld hl, SPRITE_AREA + 4 + 2
-	ld [hl], $02 ; tile number
-    ld hl, SPRITE_AREA + 4 + 3
-	ld [hl], $00 ; attributes
-    ld hl, $C101 ; end your turn
-    ld [hl], $01
+; call check_win ; check for win
 
 ; Draw
 call wait_vblank
 call HRAM
 
+ld a, [SQ_CHOSEN]
+cp 1
+call z, end_of_turn
+
 jp game_loop
-	
-end:
-jp end
+
+check_win: ; to do
+	ret
+
+end_of_turn1:
+	ld hl, TURN
+	ld [hl], $02
+	ld hl, SQ_CHOSEN
+	ld [hl], $00
+	ret
+
+end_of_turn:
+	ld a, [TURN] ; end of turn
+	cp 1
+	jr z, @change_to_CPU
+
+	ld a, [TURN]
+	cp 2
+	jr z, @change_to_player
+
+	@done:
+		ld hl, SQ_CHOSEN
+		ld [hl], $00
+		ret
+
+	@change_to_CPU:
+		ld hl, TURN
+		ld [hl], $02
+		jr @done
+
+	@change_to_player:
+		ld hl, TURN
+		ld [hl], $01
+		jr @done
