@@ -16,6 +16,7 @@
 .DEFINE TURN $C101 ; current turn (Human => 1, CPU => 2)
 .DEFINE SQ_CHOSEN $C102 ; if player has picked a square this will be 1, otherwise 0
 .DEFINE BOARD_MAP $C103 ; map of board that stores who has each square
+.DEFINE WIN $C10C ; set to 1 if player won, set to 2 if cpu won, set to 3 for tie
 
 ; Sprites
 .DEFINE SPRITE_CURSOR SPRITE_AREA ; cursor sprite

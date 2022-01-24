@@ -49,8 +49,7 @@ jp start
 start:
 
 call wait_vblank
-ld hl, LCDC
-res 7, [hl] ; reset the bit to turn off LCD
+call disable_LCD
 
 ; Clear the tilemap to zeros
 ld hl, BGTILES
@@ -115,23 +114,14 @@ ld [hl], $00 ; tile num
 ld hl, SPRITE_AREA + 3
 ld [hl], $00 ; attributes, keep zero for now
 
-call wait_vblank
-
-call draw_menu
-
-; Set the default cursor
-draw_menu_cursor:
-	ld hl, SPRITE_AREA
-	ld [hl], $40 ; Y coord
-	ld hl, SPRITE_AREA + 1
-	ld [hl], $30 ; X coord
-	ld hl, SPRITE_AREA + 2
-	ld [hl], $03 ; tile num
-	ld hl, SPRITE_AREA + 3
-	ld [hl], $00 ; attributes, keep zero for now
-
-call HRAM
-
+menu_setup:
+	call wait_vblank
+	call draw_menu
+	call wait_vblank
+	call draw_menu_cursor
+	call wait_vblank
+	call HRAM
+	
 menu_loop:
 ; Input
 call read_input
@@ -199,26 +189,43 @@ cp 2
 call z, CPU_input ; CPU's turn
 
 ; Logic
-; call check_win ; check for win
+call check_win_cpu ; check for win
 
 ; Draw
 call wait_vblank
 call HRAM
+call draw_player_turn ; need one for CPU too
 
+; Change turns
 ld a, [SQ_CHOSEN]
 cp 1
 call z, end_of_turn
 
+; go to main menu upon win...will need to rewrite once win checking is working
+ld a, [WIN]
+cp 2
+jp z, start ; should be somewhere else
+
 jp game_loop
 
-check_win: ; to do
-	ret
+check_win_cpu: ; to do
+	; check horizontals
+	ld hl, BOARD_MAP
+	ld b, 1
+	call check_all
 
-end_of_turn1:
-	ld hl, TURN
-	ld [hl], $02
-	ld hl, SQ_CHOSEN
-	ld [hl], $00
+	ld hl, BOARD_MAP + 3
+	ld b, 1
+	call check_all
+
+	ld hl, BOARD_MAP + 6
+	ld b, 1
+	call check_all
+	
+	; check verticals
+
+	; check diagonals
+
 	ret
 
 end_of_turn:
@@ -244,3 +251,75 @@ end_of_turn:
 		ld hl, TURN
 		ld [hl], $01
 		jr @done
+
+; to remove once I have confidence that check_all works properly
+check_horizontals:
+		ld a, [hl]
+		cp 2
+		jr z, @2nd_square
+		jr @end
+
+		@2nd_square:
+			ld a, [hl+]
+			cp 2
+			jr z, @3rd_square
+			jr @end
+		
+		@3rd_square:
+			ld a, [hl+] ; should be inc two,. doing this so it compiles
+			cp 2
+			jr z, @winner
+			jr @end
+
+		@winner:
+			ld hl, WIN
+			ld [hl], 2
+			jr @end
+
+		@end:
+			ret
+
+; need hl to have starting square to check
+; need b to hold increment
+check_all:
+	ld c, b ; for safekeeping
+		
+	; first square
+	ld a, [hl]
+	cp 2
+	jr z, @2nd_square
+	jr @end
+
+	@2nd_square:
+		inc hl
+		ld a, [hl]
+		dec b
+		jr z, @do_the_check
+		jr @2nd_square
+
+		@do_the_check:
+		; already loaded in and ready to go!
+		cp 2
+		jr z, @3rd_square
+		jr @end
+		
+	@3rd_square:
+		inc hl
+		ld a, [hl]
+		dec c
+		jr z, @do_the_check_again
+		jr @3rd_square
+
+		@do_the_check_again:
+			; already loaded in and ready to go!
+			cp 2
+			jr z, @winner
+			jr @end
+
+	@winner:
+		ld hl, WIN
+		ld [hl], 2
+		jr @end
+
+	@end:
+		ret

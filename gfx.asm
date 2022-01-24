@@ -31,6 +31,12 @@ wait_vblank:
 	jr nz, wait_vblank
     ret
 
+; Disable LCD
+disable_LCD:
+    ld hl, LCDC
+    res 7, [hl] ; reset the bit to turn off LCD
+    ret
+
 ; Draw the board function
 draw_board:
     ld hl, BGTILES + 2
@@ -123,6 +129,18 @@ draw_menu:
     ld [hl], 23
     ret
 
+; Draw the menu cursor function
+draw_menu_cursor:
+		ld hl, SPRITE_AREA
+		ld [hl], $40 ; Y coord
+		ld hl, SPRITE_AREA + 1
+		ld [hl], $30 ; X coord
+		ld hl, SPRITE_AREA + 2
+		ld [hl], $03 ; tile num
+		ld hl, SPRITE_AREA + 3
+		ld [hl], $00 ; attributes, keep zero for now
+        ret
+
 ; Copy loop - for copying into a section of RAM (also good for DMA transfer)
 ; hl - output location
 ; de - input location
@@ -153,7 +171,7 @@ big_copy_loop:
 ; hl - section location
 ; b - counter (0 - 255)
 clear_loop:
-	ld [hl], c
+	ld [hl], 0 ; should this c be zero?
     inc hl
 	dec b
 	jr nz, clear_loop
@@ -264,6 +282,33 @@ draw_board_sprites:
     ld [hl], $04 ; tile num, use empty sprite
     ld hl, SPRITE_9 + 3
     ld [hl], $00 ; attributes, keep zero for now
+    ret
+
+; Draws text for player turn
+draw_player_turn:
+    ld hl, BGTILES + 11; P
+    ld [hl], 19
+    ld hl, BGTILES + 12; L
+    ld [hl], 15
+    ld hl, BGTILES + 13; A
+    ld [hl], 4
+    ld hl, BGTILES + 14; Y
+    ld [hl], 28
+    ld hl, BGTILES + 15; E
+    ld [hl], 8
+    ld hl, BGTILES + 16; R
+    ld [hl], 21
+    ld hl, BGTILES + 17; S
+    ld [hl], 22
+
+    ld hl, BGTILES + 11 + 32; T
+    ld [hl], 23
+    ld hl, BGTILES + 12 + 32; U
+    ld [hl], 24
+    ld hl, BGTILES + 13 + 32; R
+    ld [hl], 21
+    ld hl, BGTILES + 14 + 32; N
+    ld [hl], 17
     ret
 
 ; Tictactoe tiles
